@@ -23,8 +23,8 @@ GameObject:
   - 136: {fileID: 136000010347858958}
   - 23: {fileID: 23000010840978852}
   - 54: {fileID: 54000013145844126}
-  - 114: {fileID: 114000013727136892}
   - 82: {fileID: 82000011146125696}
+  - 114: {fileID: 114000013727136892}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Untagged
@@ -102,7 +102,7 @@ AudioSource:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000011661577676}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 36e0fcf55cbf376438a9428d3c66eca7, type: 3}
@@ -183,6 +183,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectileSpeed: 15
   damage: 500
+  explosionPrefab: {fileID: 1000010868245114, guid: 9b2b44ef545022646a17910ebeee1b16,
+    type: 2}
 --- !u!136 &136000010347858958
 CapsuleCollider:
   m_ObjectHideFlags: 1

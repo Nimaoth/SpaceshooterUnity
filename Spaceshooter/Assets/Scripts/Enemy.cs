@@ -61,7 +61,10 @@ public class Enemy : MonoBehaviour {
     {
         if (other.gameObject.tag == "Player")
         {
-            other.gameObject.GetComponent<Player>().TakeDamage(damage);
+            Player.Lives--;
+            Player.UpdateStats();
+
+            Reset();
         }
     }
 }

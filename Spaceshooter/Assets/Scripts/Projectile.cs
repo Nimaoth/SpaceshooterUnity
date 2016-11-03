@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Projectile : MonoBehaviour {
 
     public float projectileSpeed;
     public float damage;
+
+    public GameObject explosionPrefab;
 
     // 
     private new Collider collider;
@@ -33,6 +36,11 @@ public class Projectile : MonoBehaviour {
             renderer.enabled = false;
 
             other.GetComponent<Enemy>().TakeDamage(damage);
+
+            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
+            Player.Score += 100;
+            Player.UpdateStats();
         }
     }
 }

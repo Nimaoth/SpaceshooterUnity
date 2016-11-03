@@ -1,25 +1,30 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Player : MonoBehaviour
 {
-    //
-    public float playerSpeed;
-    public float maxHealth;
-    public float fireRate;
-    public GameObject projectilePrefab;
+    public static int Score = 0;
+    public static int Lives = 3;
+    public static Text playerStats;
+    
 
     //
-    private float currentHealth;
+    public float playerSpeed;
+    public float fireRate;
+
+    //
     private float fireTimer;
     private float inverseFireRate;
 
     // Use this for initialization
     void Start()
     {
-        currentHealth = maxHealth;
         inverseFireRate = 1f / fireRate;
         fireTimer = inverseFireRate;
+
+        playerStats = GameObject.Find("PlayerStats").GetComponent<Text>();
+        UpdateStats();
     }
 
     // Update is called once per frame
@@ -34,52 +39,33 @@ public class Player : MonoBehaviour
 
         // the bounds of the screen, past it the player will be moved to the other side
         // half of the window size + half of the players size (which is 1.5)
-        float bounds = width / 2f + 0.75f;
+        float boundsX = width / 2f + 0.75f;
+        float boundsY = height / 2f;
 
         // Move Player depending on Input
-        float amtToMove = Input.GetAxis("Horizontal") * playerSpeed * Time.deltaTime;
-        transform.Translate(Vector3.right * amtToMove);
+        float hor = Input.GetAxis("Horizontal");
+        float amtToMoveX = hor * playerSpeed * Time.deltaTime;
+        float amtToMoveY = Input.GetAxis("Vertical") * playerSpeed * Time.deltaTime;
+
+        transform.Translate(new Vector3(amtToMoveX, amtToMoveY), Space.World);
+
+        transform.rotation = Quaternion.Slerp(Quaternion.identity, Quaternion.Euler(0, Mathf.Sign(hor) * -30, 0), Mathf.Abs(hor));
 
         // Screen wrap
-        if (transform.position.x < -bounds)
-            transform.position = new Vector3(bounds, transform.position.y, transform.position.z);
+        if (transform.position.x < -boundsX)
+            transform.position = new Vector3(boundsX, transform.position.y, transform.position.z);
 
-        if (transform.position.x > bounds)
-            transform.position = new Vector3(-bounds, transform.position.y, transform.position.z);
+        if (transform.position.x > boundsX)
+            transform.position = new Vector3(-boundsX, transform.position.y, transform.position.z);
 
-        // fire if fire axis is fired
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            fireTimer = inverseFireRate;
-            Fire();
-        }
-
-        // fire
-        if (Input.GetKey(KeyCode.Space))
-            Fire();
+        if (transform.position.y > boundsY + 0.25f)
+            transform.position = new Vector3(transform.position.x, boundsY + 0.25f, transform.position.z);
+        if (transform.position.y < -boundsY + 1.75f)
+            transform.position = new Vector3(transform.position.x, -boundsY + 1.75f, transform.position.z);
     }
 
-    void Fire()
+    public static void UpdateStats()
     {
-        fireTimer += Time.deltaTime;
-        if (fireTimer < inverseFireRate)
-            return;
-
-        fireTimer = 0;
-
-        // instantiate projectile
-        var position = transform.position + Vector3.up * (transform.localScale.y * 0.6f);
-        Instantiate(projectilePrefab, position, Quaternion.identity);
-    }
-
-    public void TakeDamage(float damage)
-    {
-        currentHealth -= damage;
-
-        if (currentHealth <= 0)
-        {
-            // game over
-            Debug.Log("Game Over!");
-        }
+        playerStats.text = "Score: " + Score.ToString() + "\nLives: " + Lives.ToString();
     }
 }
