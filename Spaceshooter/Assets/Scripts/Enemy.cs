@@ -52,8 +52,7 @@ public class Enemy : MonoBehaviour {
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            collider.enabled = false;
-            renderer.enabled = false;
+            Reset();
         }
     }
 

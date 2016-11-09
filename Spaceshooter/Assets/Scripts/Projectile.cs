@@ -16,7 +16,7 @@ public class Projectile : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         collider = GetComponent<Collider>();
-        renderer = GetComponent<Renderer>();
+        renderer = GetComponentInChildren<Renderer>();
 	}
 	
 	// Update is called once per frame
@@ -37,7 +37,11 @@ public class Projectile : MonoBehaviour {
 
             other.GetComponent<Enemy>().TakeDamage(damage);
 
-            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            if (explosionPrefab != null)
+            {
+                Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            }
+
 
             Player.Score += 100;
             Player.UpdateStats();

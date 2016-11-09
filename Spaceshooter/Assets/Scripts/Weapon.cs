@@ -1,13 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Weapon : MonoBehaviour {
+public abstract class Weapon : MonoBehaviour {
 
     public float fireRate;
     public bool fireOnSingleHit;
-    public GameObject projectilePrefab;
 
     private float fireTimer;
+
+    void Start()
+    {
+        fireTimer = float.MaxValue;
+    }
 
 	// Update is called once per frame
 	void Update () {
@@ -22,7 +26,6 @@ public class Weapon : MonoBehaviour {
         if (Input.GetKey(KeyCode.Space))
             Fire();
 
-        Debug.Log("ok");
     }
 
     void Fire()
@@ -34,7 +37,8 @@ public class Weapon : MonoBehaviour {
         fireTimer = 0;
 
         // instantiate projectile
-        var position = transform.position + Vector3.up * (transform.localScale.y * 0.6f);
-        Instantiate(projectilePrefab, position, Quaternion.identity);
+        CreateProjectiles();
     }
+
+    public abstract void CreateProjectiles();
 }
