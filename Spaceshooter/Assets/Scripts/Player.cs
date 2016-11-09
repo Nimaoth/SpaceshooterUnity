@@ -142,7 +142,9 @@ public class Player : MonoBehaviour
     private void UpdateStateDash()
     {
         transform.Translate(new Vector3(currentDashSpeed * Time.deltaTime, 0), Space.World);
-        transform.rotation = Quaternion.Euler(0, map(currentDashSpeed, -dashSpeed, dashSpeed, -360, 360), 0);
+
+
+        transform.rotation = Quaternion.Euler(0, Mathf.Sign(currentDashSpeed) * map(Mathf.Abs(currentDashSpeed), 0, dashSpeed, -400, 0), 0);
 
 
         currentDashSpeed = Mathf.Lerp(currentDashSpeed, 0, dashFade);
