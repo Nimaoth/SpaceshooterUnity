@@ -14,7 +14,10 @@ public abstract class Weapon : MonoBehaviour {
     }
 
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
+        fireTimer += Time.deltaTime;
+
         // fire if fire axis is fired
         if (fireOnSingleHit && Input.GetKeyDown(KeyCode.Space))
         {
@@ -30,7 +33,6 @@ public abstract class Weapon : MonoBehaviour {
 
     void Fire()
     {
-        fireTimer += Time.deltaTime;
         if (fireTimer < 1f / fireRate)
             return;
 

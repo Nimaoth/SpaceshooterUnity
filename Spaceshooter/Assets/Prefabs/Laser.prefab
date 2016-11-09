@@ -110,5 +110,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 2
-  fireOnSingleHit: 0
+  fireOnSingleHit: 1
   projectile: {fileID: 1000013698040308, guid: 40dc7b346cea52245a84594ff4150115, type: 2}

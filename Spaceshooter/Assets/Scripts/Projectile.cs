@@ -12,11 +12,15 @@ public class Projectile : MonoBehaviour {
     // 
     private new Collider collider;
     private new Renderer renderer;
+    
+    private float lifeTime;
 
 	// Use this for initialization
 	void Start () {
         collider = GetComponent<Collider>();
         renderer = GetComponentInChildren<Renderer>();
+
+        lifeTime = 0;
 	}
 	
 	// Update is called once per frame
@@ -24,8 +28,12 @@ public class Projectile : MonoBehaviour {
         float amtToMove = projectileSpeed * Time.deltaTime;
         transform.Translate(Vector3.up * amtToMove);
 
-        if (transform.position.y > 6.4f)
+        lifeTime += Time.deltaTime;
+        if (lifeTime > 0.5 && !renderer.isVisible)
+        {
             Destroy(gameObject);
+            return;
+        }
 	}
 
     void OnTriggerEnter(Collider other)

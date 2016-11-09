@@ -12,7 +12,7 @@ public class Laser : Weapon
         {
             Transform t = transform.GetChild(i);
 
-            Instantiate(projectile, t.position, Quaternion.identity);
+            Instantiate(projectile, new Vector3(t.position.x, t.position.y, 0), Quaternion.Euler(0, 0, t.rotation.eulerAngles.z));
         }
     }
 }
