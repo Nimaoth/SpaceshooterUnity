@@ -17,7 +17,7 @@ public class Projectile : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        collider = GetComponent<Collider>();
+        collider = GetComponentInChildren<Collider>();
         renderer = GetComponentInChildren<Renderer>();
 
         lifeTime = 0;
@@ -43,7 +43,7 @@ public class Projectile : MonoBehaviour {
             collider.enabled = false;
             renderer.enabled = false;
 
-            other.GetComponent<Enemy>().TakeDamage(damage);
+            other.transform.parent.GetComponent<Enemy>().TakeDamage(damage);
 
             if (explosionPrefab != null)
             {

@@ -19,8 +19,8 @@ public class Enemy : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        collider = GetComponent<Collider>();
-        renderer = GetComponent<Renderer>();
+        collider = GetComponentInChildren<Collider>();
+        renderer = GetComponentInChildren<Renderer>();
 
         Reset();
 	}
@@ -36,7 +36,7 @@ public class Enemy : MonoBehaviour {
         }
 	}
 
-    void Reset()
+    public void Reset()
     {
         currentSpeed = Random.Range(minSpeed, maxSpeed);
         transform.position = new Vector3(Random.Range(-6f, 6f), 7, 0);
@@ -52,17 +52,6 @@ public class Enemy : MonoBehaviour {
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            Reset();
-        }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Player")
-        {
-            Player.Lives--;
-            Player.UpdateStats();
-
             Reset();
         }
     }

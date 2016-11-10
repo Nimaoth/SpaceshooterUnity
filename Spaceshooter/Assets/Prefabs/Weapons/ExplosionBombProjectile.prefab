@@ -129,7 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f20e5f31eeb6c04eb9e2c23babe5b29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  laserCount: 5
+  laserCount: 3
   sprayProjectiles: {fileID: 1000013698040308, guid: 40dc7b346cea52245a84594ff4150115,
     type: 2}
 --- !u!114 &114000010270707652

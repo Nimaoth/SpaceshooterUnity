@@ -1,48 +1,69 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using System.Collections.Generic;
 
 public class Player : MonoBehaviour
 {
     enum PlayerState
     {
         normal,
-        dash
+        dash,
+        dead
     }
 
-    public static int Score = 0;
+    private static int _score;
+    public static int Score
+    {
+        get
+        {
+            return _score;
+        }
+        set
+        {
+            int oldScore = _score;
+            _score = value;
+            Instance.OnScoreChange(oldScore, value);
+        }
+    }
     public static int Lives = 3;
     public static Text playerStats;
-    
+    private static Player Instance;
 
     //
     public float playerSpeed;
     public float rotationSpeed;
-    public float fireRate;
     public float dashSpeed;
     public float dashFade;
+    public float respawnTime;
+    public GameObject explosionPrefab;
+    public List<GameObject> weaponPrefabs;
+    public int[] weaponScores;
+
 
     //
-    private float fireTimer;
-    private float inverseFireRate;
+    private float respawnTimer = 0;
 
     private float leftDoubleTapTime = 0;
     private float rightDoubleTapTime = 0;
-
     private float currentDashSpeed = 0;
 
     private PlayerState state;
 
+    private GameObject currentWeapon;
+    private int currentWeaponIndex = 0;
+
     // Use this for initialization
     void Start()
     {
-        inverseFireRate = 1f / fireRate;
-        fireTimer = inverseFireRate;
+        Instance = this;
 
         playerStats = GameObject.Find("PlayerStats").GetComponent<Text>();
         UpdateStats();
 
         state = PlayerState.normal;
+
+        var weapon = transform.FindChild("Weapon");
+        currentWeapon = (GameObject) Instantiate(weaponPrefabs[0], transform.position, Quaternion.identity, weapon);
     }
 
     // Update is called once per frame
@@ -57,7 +78,7 @@ public class Player : MonoBehaviour
 
         // the bounds of the screen, past it the player will be moved to the other side
         // half of the window size + half of the players size (which is 1.5)
-        float boundsX = width / 2f - 0.5f;// + 0.75f;
+        float boundsX = width / 2f + 0.75f;// - 0.5f;
         float boundsY = height / 2f;
 
 
@@ -69,15 +90,20 @@ public class Player : MonoBehaviour
             case PlayerState.dash:
                 UpdateStateDash();
                 break;
+            case PlayerState.dead:
+                respawnTimer += Time.deltaTime;
+                if (respawnTimer >= respawnTime)
+                    Spawn();
+                break;
         }
         
 
         // Screen wrap
         if (transform.position.x < -boundsX)
-            transform.position = new Vector3(-boundsX, transform.position.y, transform.position.z);
+            transform.position = new Vector3(boundsX, transform.position.y, transform.position.z);
 
         if (transform.position.x > boundsX)
-            transform.position = new Vector3(boundsX, transform.position.y, transform.position.z);
+            transform.position = new Vector3(-boundsX, transform.position.y, transform.position.z);
 
         if (transform.position.y > boundsY + 0.25f)
             transform.position = new Vector3(transform.position.x, boundsY + 0.25f, transform.position.z);
@@ -165,5 +191,61 @@ public class Player : MonoBehaviour
     public static void UpdateStats()
     {
         playerStats.text = "Score: " + Score.ToString() + "\nLives: " + Lives.ToString();
+    }
+
+    public void OnTriggerEnter(Collider collider)
+    {
+        if (collider.tag == "Enemy")
+        {
+            Player.Lives--;
+            if (Player.Lives == 0)
+            {
+                Die();
+            }
+            Player.UpdateStats();
+
+            collider.GetComponentInParent<Enemy>().Reset();
+        }
+    }
+
+    public void Spawn()
+    {
+        Player.Lives = 3;
+        Player.Score = 0;
+        transform.position = Vector3.zero;
+
+        state = PlayerState.normal;
+        GetComponentInChildren<Renderer>().enabled = true;
+        GetComponentInChildren<Collider>().enabled = true;
+    }
+
+    private void Die()
+    {
+        SpawnExplosion();
+
+        state = PlayerState.dead;
+        respawnTimer = 0;
+        GetComponentInChildren<Renderer>().enabled = false;
+        GetComponentInChildren<Collider>().enabled = false;
+    }
+
+    private void SpawnExplosion()
+    {
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+    }
+
+    private void OnScoreChange(int oldValue, int newValue)
+    {
+        int next = currentWeaponIndex + 1;
+        if (next > 0 && next < weaponScores.Length && next < weaponPrefabs.Count)
+        {
+            if (oldValue < weaponScores[next] && newValue >= weaponScores[next])
+            {
+                Destroy(currentWeapon);
+                currentWeapon = (GameObject)Instantiate(weaponPrefabs[next], transform.position, Quaternion.identity, transform.FindChild("Weapon"));
+
+                currentWeaponIndex = next;
+            }
+        }
     }
 }
