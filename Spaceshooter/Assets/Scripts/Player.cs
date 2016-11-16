@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -25,7 +26,8 @@ public class Player : MonoBehaviour
             Instance.OnScoreChange(oldScore, value);
         }
     }
-    public static int Lives = 3;
+    public static int Lives = 1;
+    public static int Missed = 0;
     public static Text playerStats;
     private static Player Instance;
 
@@ -38,11 +40,10 @@ public class Player : MonoBehaviour
     public GameObject explosionPrefab;
     public List<GameObject> weaponPrefabs;
     public int[] weaponScores;
+    public StartGameButtonBehaviour uiManager;
 
 
     //
-    private float respawnTimer = 0;
-
     private float leftDoubleTapTime = 0;
     private float rightDoubleTapTime = 0;
     private float currentDashSpeed = 0;
@@ -55,6 +56,10 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Lives = 1;
+        Missed = 0;
+        _score = 0;
+
         Instance = this;
 
         playerStats = GameObject.Find("PlayerStats").GetComponent<Text>();
@@ -91,9 +96,6 @@ public class Player : MonoBehaviour
                 UpdateStateDash();
                 break;
             case PlayerState.dead:
-                respawnTimer += Time.deltaTime;
-                if (respawnTimer >= respawnTime)
-                    Spawn();
                 break;
         }
         
@@ -147,13 +149,13 @@ public class Player : MonoBehaviour
             rightDoubleTapTime = Time.time;
         }
 
-        if (doubleTapLeft)
+        if (doubleTapLeft || Input.GetKeyDown(KeyCode.Q))
         {
             state = PlayerState.dash;
             currentDashSpeed = -dashSpeed;
         }
 
-        if (doubleTapRight)
+        if (doubleTapRight || Input.GetKeyDown(KeyCode.E))
         {
             state = PlayerState.dash;
             currentDashSpeed = dashSpeed;
@@ -190,7 +192,7 @@ public class Player : MonoBehaviour
 
     public static void UpdateStats()
     {
-        playerStats.text = "Score: " + Score.ToString() + "\nLives: " + Lives.ToString();
+        playerStats.text = "Score: " + Score.ToString() + "\nLives: " + Lives.ToString() + "\nMissed: " + Missed.ToString();
     }
 
     public void OnTriggerEnter(Collider collider)
@@ -198,40 +200,16 @@ public class Player : MonoBehaviour
         if (collider.tag == "Enemy")
         {
             Player.Lives--;
-            if (Player.Lives == 0)
-            {
-                Die();
-            }
             Player.UpdateStats();
+            StartCoroutine(DestroyShip());
 
             collider.GetComponentInParent<Enemy>().Reset();
         }
     }
 
-    public void Spawn()
+    private void Lose()
     {
-        Player.Lives = 3;
-        Player.Score = 0;
-        transform.position = Vector3.zero;
-
-        state = PlayerState.normal;
-        GetComponentInChildren<Renderer>().enabled = true;
-        GetComponentInChildren<Collider>().enabled = true;
-    }
-
-    private void Die()
-    {
-        SpawnExplosion();
-
-        state = PlayerState.dead;
-        respawnTimer = 0;
-        GetComponentInChildren<Renderer>().enabled = false;
-        GetComponentInChildren<Collider>().enabled = false;
-    }
-
-    private void SpawnExplosion()
-    {
-        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        uiManager.LoadLevelByName("Lose");
     }
 
     private void OnScoreChange(int oldValue, int newValue)
@@ -247,5 +225,47 @@ public class Player : MonoBehaviour
                 currentWeaponIndex = next;
             }
         }
+
+        if (_score >= 3000)
+        {
+            uiManager.LoadLevelByName("Win");
+        }
+    }
+
+    IEnumerator DestroyShip()
+    {
+        Disable();
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        transform.position = new Vector3(0, 0, 0);
+
+        yield return new WaitForSeconds(1.5f);
+        
+        if (Player.Lives == 0)
+        {
+            Lose();
+            yield return null;
+        }
+
+        Enable();
+        state = PlayerState.normal;
+
+        currentWeaponIndex = 0;
+        Destroy(currentWeapon);
+        currentWeapon = (GameObject)Instantiate(weaponPrefabs[0], transform.position, Quaternion.identity, transform.Find("Weapon"));
+    }
+
+    private void Enable()
+    {
+        GetComponentInChildren<Renderer>().enabled = true;
+        GetComponentInChildren<Collider>().enabled = true;
+
+        transform.Find("Weapon").gameObject.SetActive(true);
+    }
+    private void Disable()
+    {
+        GetComponentInChildren<Renderer>().enabled = false;
+        GetComponentInChildren<Collider>().enabled = false;
+
+        transform.Find("Weapon").gameObject.SetActive(false);
     }
 }

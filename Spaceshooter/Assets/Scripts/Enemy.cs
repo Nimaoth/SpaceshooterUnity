@@ -33,6 +33,8 @@ public class Enemy : MonoBehaviour {
         if (transform.position.y <= -5)
         {
             Reset();
+            Player.Missed++;
+            Player.UpdateStats();
         }
 	}
 
