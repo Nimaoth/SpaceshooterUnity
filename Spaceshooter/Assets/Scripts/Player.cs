@@ -28,8 +28,10 @@ public class Player : MonoBehaviour
     }
     public static int Lives = 1;
     public static int Missed = 0;
+    public static int ShieldAmount = 0;
     public static Text playerStats;
     private static Player Instance;
+
 
     //
     public float playerSpeed;
@@ -53,12 +55,15 @@ public class Player : MonoBehaviour
     private GameObject currentWeapon;
     private int currentWeaponIndex = 0;
 
+    private GameObject shield;
+
     // Use this for initialization
     void Start()
     {
         Lives = 1;
         Missed = 0;
         _score = 0;
+        ShieldAmount = 100;
 
         Instance = this;
 
@@ -69,6 +74,8 @@ public class Player : MonoBehaviour
 
         var weapon = transform.FindChild("Weapon");
         currentWeapon = (GameObject) Instantiate(weaponPrefabs[0], transform.position, Quaternion.identity, weapon);
+
+        shield = transform.Find("Shield").gameObject;
     }
 
     // Update is called once per frame
@@ -199,9 +206,22 @@ public class Player : MonoBehaviour
     {
         if (collider.tag == "Enemy")
         {
-            Player.Lives--;
-            Player.UpdateStats();
-            StartCoroutine(DestroyShip());
+            if (ShieldAmount > 0)
+            {
+                ShieldAmount -= collider.GetComponentInParent<Enemy>().damage;
+                if (ShieldAmount <= 0)
+                {
+                    ShieldAmount = 0;
+                    shield.GetComponent<Shield>().UpdateStats();
+                    shield.SetActive(false);
+                }
+            }
+            else
+            {
+                Player.Lives--;
+                Player.UpdateStats();
+                StartCoroutine(DestroyShip());
+            }
 
             collider.GetComponentInParent<Enemy>().Reset();
         }

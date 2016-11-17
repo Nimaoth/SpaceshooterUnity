@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour {
     public float maxSpeed;
     public float maxHealh;
 
-    public float damage;
+    public int damage;
 
     //
     private float currentSpeed;
