@@ -7,6 +7,7 @@ public class AimingRocket : MonoBehaviour {
     public float speed = 3;
     public float rotationSpeed = 0.1f;
     public float lifeTime = 2;
+    public GameObject explosionPrefab;
 
 
     //
@@ -81,6 +82,6 @@ public class AimingRocket : MonoBehaviour {
     private void Explode()
     {
         Destroy(gameObject);
-        Debug.Log("explode");
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
     }
 }

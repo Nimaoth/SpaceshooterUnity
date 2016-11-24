@@ -138,6 +138,8 @@ MonoBehaviour:
   speed: 10
   rotationSpeed: 0.05
   lifeTime: 2
+  explosionPrefab: {fileID: 1000011032135660, guid: 8585c150eb2b2ef4f8dd573b673079b5,
+    type: 2}
 --- !u!136 &136000013726119692
 CapsuleCollider:
   m_ObjectHideFlags: 1

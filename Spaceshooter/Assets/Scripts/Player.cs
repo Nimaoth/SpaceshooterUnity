@@ -46,6 +46,7 @@ public class Player : MonoBehaviour
 
 
     //
+    
     private float leftDoubleTapTime = 0;
     private float rightDoubleTapTime = 0;
     private float currentDashSpeed = 0;
@@ -246,7 +247,7 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (_score >= 3000)
+        if (_score >= 30000)
         {
             uiManager.LoadLevelByName("Win");
         }
